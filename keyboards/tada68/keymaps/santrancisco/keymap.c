@@ -27,7 +27,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    * |----------------------------------------------------------------|
    * |Shift   |  Z|  X|  C|  V|  B|  N|  M|  ,|  .|  /|Shift | Up|PgDn|
    * |----------------------------------------------------------------|
-   * |Ctrl|Win |Alt |        Space          |Alt| FN|Ctrl|Lef|Dow|Rig |
+   * |Ctrl|Alt |LGUI|        Space          |Alt| FN|Ctrl|Lef|Dow|Rig |
    * `----------------------------------------------------------------'
    */
 [_BL] = LAYOUT_ansi(
@@ -41,11 +41,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    * ,----------------------------------------------------------------.
    * |   | F1|F2 |F3 |F4 |F5 |F6 |F7 |F8 |F9 |F10|F11|F12|Del    |Ins |
    * |----------------------------------------------------------------|
-   * |     |   |Up |   |   |   |   |   |UP |   |   |   |   |     |Hme |
+   * |    |HLFP|Up |CMB|   |   |   |   |PgUp |   |   |   |   |   |Hme |
    * |----------------------------------------------------------------|
-   * |      |<- |Dn | ->|   |   |   |<- |Dn | ->|   |   |        |End |
+   * |      |Lef|Dow|Rig|   |   |   |Hme|PgDn |End|   |   |      |End |
    * |----------------------------------------------------------------|
-   * |        |   |BR |Bl-|BL |BL+|   MUT||VU-|VU+|   |   McL|MsU|McR |
+   * |        |   |RSP|RST|RPS|   |   |MUT||VU-|VU+ |   | McL|MsU|McR |
    * |----------------------------------------------------------------|
    * |    |    |    |                       |   |   |    |MsL|MsD|MsR |
    * `----------------------------------------------------------------'
@@ -59,6 +59,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 
 bool shiftisheld = false;
+bool leftalt   = false;
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   if (!process_record_dynamic_macro(keycode, record)) {
@@ -74,6 +75,22 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
           shiftisheld = false;
         }
       break;
+    case KC_LALT:
+        if (record->event.pressed)
+        {
+          leftalt = true;
+        }
+        else {
+          leftalt = false;
+        }
+      break;
+    case KC_2:
+      if (record->event.pressed && leftalt == true)
+      {
+        SEND_STRING(SS_TAP(X_F2));
+        return false;
+      }
+      break;
     case KC_ESC:
       if (record->event.pressed && shiftisheld == true)
       {
@@ -84,7 +101,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     case FN_COMMENTBASH:
       if (record->event.pressed)
       {
-        SEND_STRING(SS_TAP(X_HOME)"#");
+        SEND_STRING(SS_TAP(X_HOME) "#");
         return false;
       }
       break;
